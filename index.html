@@ -272,6 +272,16 @@ body {
     text-align: center;
     background: #ffe600;
     cursor: pointer;
+    padding: 0;
+    overflow: hidden;
+}
+
+#smiley-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    pointer-events: none;
 }
 
 #board-wrap {
@@ -589,7 +599,12 @@ body {
                     id="smiley-btn"
                     class="panel-out">
 
-                    🙂
+                    <!-- 같은 폴더에 평소.png / 성공.png / 게임오버.png 파일을 넣어주세요. -->
+                    <img
+                        id="smiley-image"
+                        src="평소.png"
+                        alt="게임 상태"
+                    >
 
                 </div>
 
@@ -782,6 +797,9 @@ body {
 
     const smileyBtn =
         document.getElementById("smiley-btn");
+
+    const smileyImage =
+        document.getElementById("smiley-image");
 
     const resultModalOverlay =
         document.getElementById(
@@ -1428,17 +1446,22 @@ body {
 
         if (!gameActive) return;
 
+
         const cell =
             grid[r][c];
+
 
         if (
             cell.revealed
         ) return;
 
+
         const currentFlagCount =
             countFlags();
 
+
         /* 깃발 제거 */
+
         if (
             cell.flag
         ) {
@@ -1449,6 +1472,7 @@ body {
         }
 
         /* 깃발 추가 */
+
         else {
 
             if (
@@ -1460,75 +1484,16 @@ body {
 
             }
 
+
             cell.flag =
                 true;
 
         }
 
+
         updateBoardDisplay();
 
         updateMineCounter();
-
-        /* 모든 실제 지뢰 위치에 정확히 깃발을 꽂았을 때만 CLEAR */
-        if (
-            areAllMinesCorrectlyFlagged()
-        ) {
-
-            endGame(true);
-
-        }
-
-    }
-
-
-    function areAllMinesCorrectlyFlagged() {
-
-        let correctFlagCount =
-            0;
-
-        for (
-            let r = 0;
-            r < BOARD_SIZE;
-            r++
-        ) {
-
-            for (
-                let c = 0;
-                c < BOARD_SIZE;
-                c++
-            ) {
-
-                const cell =
-                    grid[r][c];
-
-                /* 안전한 칸에 깃발이 하나라도 있으면 실패 */
-                if (
-                    cell.flag &&
-                    !cell.mine
-                ) {
-
-                    return false;
-
-                }
-
-                /* 실제 지뢰 위치에 깃발이 꽂힌 경우 */
-                if (
-                    cell.mine &&
-                    cell.flag
-                ) {
-
-                    correctFlagCount++;
-
-                }
-
-            }
-
-        }
-
-        return (
-            correctFlagCount ===
-            MINE_COUNT
-        );
 
     }
 
@@ -1780,8 +1745,8 @@ body {
 
         /* 게임오버 얼굴 */
 
-        smileyBtn.textContent =
-            "😵";
+        smileyImage.src =
+            "게임오버.png";
 
 
         /* 5초 후 결과창 */
@@ -1988,8 +1953,8 @@ body {
             won
         ) {
 
-            smileyBtn.textContent =
-                "😎";
+            smileyImage.src =
+                "성공.png";
 
 
             resultTitle.textContent =
@@ -2110,8 +2075,8 @@ body {
             "000";
 
 
-        smileyBtn.textContent =
-            "🙂";
+        smileyImage.src =
+            "평소.png";
 
 
         resultModalOverlay
