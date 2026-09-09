@@ -1,0 +1,2238 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>2027 KANGCHA CAFE : 靑春辯論 - MINESWEEPER</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: #008080;
+    font-family: "Courier New", monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body {
+    padding: 20px;
+}
+
+#window {
+    background: #c0c0c0;
+    border: 2px solid #000;
+    box-shadow:
+        inset -1px -1px 0 #000,
+        inset 1px 1px 0 #dfdfdf,
+        inset -2px -2px 0 #808080,
+        inset 2px 2px 0 #fff;
+    padding: 4px;
+    width: min(540px, 100%);
+}
+
+#titlebar {
+    background: linear-gradient(90deg, #000080, #1084d0);
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 4px 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+    font-family: Tahoma, sans-serif;
+}
+
+.title-buttons {
+    display: flex;
+}
+
+.tbtn {
+    background: #c0c0c0;
+    border: 1px solid #000;
+    box-shadow:
+        inset -1px -1px 0 #000,
+        inset 1px 1px 0 #fff;
+    color: #000;
+    width: 18px;
+    height: 16px;
+    font-size: 10px;
+    line-height: 14px;
+    text-align: center;
+    margin-left: 3px;
+}
+
+#screen-area {
+    border: 2px solid #000;
+    box-shadow:
+        inset -1px -1px 0 #fff,
+        inset 1px 1px 0 #808080;
+    padding: 10px;
+    background: #c0c0c0;
+}
+
+.panel-out {
+    background: #c0c0c0;
+    box-shadow:
+        inset -1px -1px 0 #000,
+        inset 1px 1px 0 #fff,
+        inset -2px -2px 0 #808080,
+        inset 2px 2px 0 #dfdfdf;
+}
+
+.panel-in {
+    background: #c0c0c0;
+    box-shadow:
+        inset 1px 1px 0 #000,
+        inset -1px -1px 0 #fff,
+        inset 2px 2px 0 #808080,
+        inset -2px -2px 0 #dfdfdf;
+}
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+
+/* ================= GUIDE ================= */
+
+#guide-screen {
+    text-align: center;
+    padding: 24px 8px;
+}
+
+.mine-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+#guide-screen h1 {
+    font-size: 20px;
+    color: #000080;
+    margin: 0 0 5px;
+    font-family: Tahoma, sans-serif;
+}
+
+#guide-screen h2 {
+    font-size: 11px;
+    font-weight: normal;
+    margin: 0 0 22px;
+    letter-spacing: 2px;
+}
+
+.guide-box {
+    margin: 0 auto;
+    padding: 12px;
+    max-width: 390px;
+    text-align: left;
+}
+
+.guide-title {
+    text-align: center;
+    font-size: 13px;
+    font-weight: bold;
+    color: #000080;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+}
+
+.guide-item {
+    padding: 9px 5px;
+    border-bottom: 1px solid #808080;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.guide-item:last-child {
+    border-bottom: none;
+}
+
+.guide-item b {
+    color: #000080;
+}
+
+
+/* ================= DIFFICULTY ================= */
+
+.difficulty-select {
+    margin-top: 18px;
+}
+
+.difficulty-title {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.difficulty-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.diff-btn {
+    min-width: 105px;
+    padding: 9px;
+}
+
+.diff-btn.selected {
+    box-shadow:
+        inset 1px 1px 0 #000,
+        inset -1px -1px 0 #fff,
+        inset 2px 2px 0 #808080,
+        inset -2px -2px 0 #dfdfdf;
+}
+
+#start-btn {
+    margin-top: 20px;
+    padding: 10px 35px;
+}
+
+
+/* ================= BUTTON ================= */
+
+.win-btn {
+    font-family: Tahoma, sans-serif;
+    background: #c0c0c0;
+    border: none;
+    box-shadow:
+        inset -1px -1px 0 #000,
+        inset 1px 1px 0 #fff,
+        inset -2px -2px 0 #808080,
+        inset 2px 2px 0 #dfdfdf;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.win-btn:active {
+    box-shadow:
+        inset 1px 1px 0 #000,
+        inset -1px -1px 0 #fff,
+        inset 2px 2px 0 #808080,
+        inset -2px -2px 0 #dfdfdf;
+}
+
+
+/* ================= GAME ================= */
+
+#game-screen {
+    position: relative;
+}
+
+#game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px;
+    margin-bottom: 6px;
+}
+
+.digital-display {
+    background: #000;
+    color: #ff0000;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    font-size: 23px;
+    letter-spacing: 2px;
+    padding: 3px 6px;
+    min-width: 70px;
+    text-align: center;
+}
+
+.counter-label {
+    text-align: center;
+    font-size: 8px;
+    margin-top: 4px;
+    color: #333;
+}
+
+#smiley-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 21px;
+    line-height: 38px;
+    text-align: center;
+    background: #ffe600;
+    cursor: pointer;
+}
+
+#board-wrap {
+    padding: 8px;
+    display: flex;
+    justify-content: center;
+    overflow: auto;
+}
+
+#board {
+    display: grid;
+    gap: 0;
+}
+
+.cell {
+    background: #c0c0c0;
+    box-shadow:
+        inset -1px -1px 0 #000,
+        inset 1px 1px 0 #fff,
+        inset -2px -2px 0 #808080,
+        inset 2px 2px 0 #dfdfdf;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Tahoma, sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.cell.open {
+    box-shadow:
+        inset 1px 1px 0 #808080,
+        inset -1px -1px 0 #808080;
+    cursor: default;
+}
+
+.cell.mine-hit {
+    background: #ff0000 !important;
+}
+
+.cell.wrong-flag {
+    color: #ff0000;
+    font-size: 17px;
+}
+
+.n1 { color: #0000ff; }
+.n2 { color: #008000; }
+.n3 { color: #ff0000; }
+.n4 { color: #000080; }
+.n5 { color: #800000; }
+.n6 { color: #008080; }
+.n7 { color: #000000; }
+.n8 { color: #808080; }
+
+
+/* ================= MODAL ================= */
+
+.modal-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    padding: 10px;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-box {
+    width: 100%;
+    max-width: 340px;
+    padding: 20px 14px;
+    text-align: center;
+}
+
+#result-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-family: Tahoma, sans-serif;
+}
+
+#result-title.win {
+    color: #000080;
+}
+
+#result-title.lose {
+    color: #800000;
+}
+
+#result-subtitle {
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 15px;
+    margin: 10px;
+    font-size: 13px;
+}
+
+.rlabel {
+    font-weight: bold;
+}
+
+.rvalue {
+    color: #000080;
+    font-weight: bold;
+}
+
+#result-note {
+    margin: 10px;
+    padding: 10px;
+    font-size: 10px;
+    line-height: 1.7;
+    color: #800000;
+    font-weight: bold;
+}
+
+#result-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#result-footer {
+    margin-top: 16px;
+    font-size: 9px;
+    color: #000080;
+    line-height: 1.6;
+    letter-spacing: 1px;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 480px) {
+
+    body {
+        padding: 8px;
+        align-items: flex-start;
+    }
+
+    #window {
+        margin-top: 5px;
+    }
+
+    #titlebar {
+        font-size: 10px;
+    }
+
+    #screen-area {
+        padding: 7px;
+    }
+
+    #guide-screen {
+        padding: 18px 3px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="window">
+
+    <div id="titlebar">
+        <span>MINESWEEPER.EXE</span>
+
+        <div class="title-buttons">
+            <span class="tbtn">_</span>
+            <span class="tbtn">□</span>
+            <span class="tbtn">×</span>
+        </div>
+    </div>
+
+
+    <div id="screen-area">
+
+
+        <!-- ================= GUIDE ================= -->
+
+        <div id="guide-screen" class="screen active">
+
+            <div class="mine-icon">🐶</div>
+
+            <h1>민재의 지뢰찾기</h1>
+
+            <h2>2027 KANGCHA CAFE</h2>
+
+
+            <div class="guide-box panel-in">
+
+                <div class="guide-title">
+                    GAME GUIDE
+                </div>
+
+
+                <div class="guide-item">
+                    <b>칸 열기</b><br>
+                    원하는 칸을 한 번 터치하세요.
+                </div>
+
+
+                <div class="guide-item">
+                    <b>깃발 표시</b><br>
+                    지뢰가 의심되는 같은 칸을 두 번 터치하면 깃발을 꽂을 수 있습니다.
+                    다시 두 번 터치하면 깃발을 제거할 수 있습니다.
+                </div>
+
+
+                <div class="guide-item">
+                    <b>숫자</b><br>
+                    숫자는 주변 8칸에 있는 지뢰의 개수입니다.
+                </div>
+
+
+                <div class="guide-item">
+                    <b>게임 오버</b><br>
+                    지뢰를 누르면 모든 지뢰 위치가 공개됩니다.
+                </div>
+
+
+                <div class="guide-item">
+                    <b>게임 클리어</b><br>
+                    지뢰를 피해 모든 안전한 칸을 열면 성공입니다.
+                </div>
+
+            </div>
+
+
+            <div class="difficulty-select">
+
+                <div class="difficulty-title">
+                    난이도를 선택하세요
+                </div>
+
+
+                <div class="difficulty-buttons">
+
+                    <button
+                        class="win-btn diff-btn selected"
+                        data-size="9"
+                        data-mines="10">
+
+                        EASY<br>
+                        9 × 9
+
+                    </button>
+
+
+                    <button
+                        class="win-btn diff-btn"
+                        data-size="12"
+                        data-mines="22">
+
+                        HARD<br>
+                        12 × 12
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <button
+                id="start-btn"
+                class="win-btn">
+
+                게임 시작
+
+            </button>
+
+        </div>
+
+
+        <!-- ================= GAME ================= -->
+
+        <div
+            id="game-screen"
+            class="screen">
+
+
+            <div
+                id="game-header"
+                class="panel-in">
+
+
+                <div>
+
+                    <div
+                        id="mine-counter"
+                        class="digital-display">
+
+                        010
+
+                    </div>
+
+                    <div class="counter-label">
+                        남은 깃발
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="smiley-btn"
+                    class="panel-out">
+
+                    🙂
+
+                </div>
+
+
+                <div>
+
+                    <div
+                        id="score-counter"
+                        class="digital-display">
+
+                        000
+
+                    </div>
+
+                    <div class="counter-label">
+                        찾은 안전칸
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="board-wrap"
+                class="panel-in">
+
+                <div id="board"></div>
+
+            </div>
+
+
+            <!-- ================= RESULT ================= -->
+
+            <div
+                id="result-modal-overlay"
+                class="modal-overlay">
+
+
+                <div
+                    class="modal-box panel-out">
+
+
+                    <div id="result-title"></div>
+
+                    <div id="result-subtitle"></div>
+
+
+                    <div
+                        class="result-row panel-in">
+
+                        <span class="rlabel">
+                            SCORE
+                        </span>
+
+                        <span
+                            class="rvalue"
+                            id="res-score">
+
+                            000
+
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="result-note"
+                        class="panel-in">
+
+                        게임 결과 화면을 캡처하여<br>
+                        지정된 게시글에<br>
+                        참여 인증을 완료해주세요.
+
+                    </div>
+
+
+                    <div id="result-buttons">
+
+                        <button
+                            class="win-btn"
+                            id="retry-btn">
+
+                            다시 하기
+
+                        </button>
+
+
+                        <button
+                            class="win-btn"
+                            id="home-btn">
+
+                            홈 화면
+
+                        </button>
+
+                    </div>
+
+
+                    <div id="result-footer">
+
+                        2027 KANGCHA CAFE<br>
+                        靑春辯論
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script>
+(function () {
+
+    "use strict";
+
+
+    /* ================= CONFIG ================= */
+
+    const GAME_OVER_DELAY = 5000;
+
+    const DOUBLE_TAP_DELAY = 300;
+
+
+    /* ================= GAME SETTINGS ================= */
+
+    let BOARD_SIZE = 9;
+
+    let MINE_COUNT = 10;
+
+    let TOTAL_CELLS = 81;
+
+    let SAFE_CELLS = 71;
+
+
+    const IS_TOUCH_DEVICE =
+        ("ontouchstart" in window) ||
+        (navigator.maxTouchPoints > 0);
+
+
+    /* ================= STATE ================= */
+
+    let grid = [];
+
+    let firstClickDone = false;
+
+    let gameActive = false;
+
+    let gameOverProcessing = false;
+
+    let openedSafeCount = 0;
+
+    let cellElems = [];
+
+
+    let lastTapTimes = {};
+
+    let pendingTimers = {};
+
+
+    /* ================= DOM ================= */
+
+    const screens = {
+        guide:
+            document.getElementById("guide-screen"),
+
+        game:
+            document.getElementById("game-screen")
+    };
+
+
+    const boardEl =
+        document.getElementById("board");
+
+    const startBtn =
+        document.getElementById("start-btn");
+
+    const mineCounterEl =
+        document.getElementById("mine-counter");
+
+    const scoreCounterEl =
+        document.getElementById("score-counter");
+
+    const smileyBtn =
+        document.getElementById("smiley-btn");
+
+    const resultModalOverlay =
+        document.getElementById(
+            "result-modal-overlay"
+        );
+
+    const resultTitle =
+        document.getElementById(
+            "result-title"
+        );
+
+    const resultSubtitle =
+        document.getElementById(
+            "result-subtitle"
+        );
+
+    const resScore =
+        document.getElementById(
+            "res-score"
+        );
+
+    const retryBtn =
+        document.getElementById(
+            "retry-btn"
+        );
+
+    const homeBtn =
+        document.getElementById(
+            "home-btn"
+        );
+
+    const difficultyButtons =
+        document.querySelectorAll(
+            ".diff-btn"
+        );
+
+
+    /* ================= SCREEN ================= */
+
+    function showScreen(name) {
+
+        Object.values(screens)
+            .forEach(screen => {
+
+                screen.classList
+                    .remove("active");
+
+            });
+
+
+        screens[name]
+            .classList
+            .add("active");
+    }
+
+
+    /* ================= GRID ================= */
+
+    function createEmptyGrid() {
+
+        const newGrid = [];
+
+
+        for (
+            let r = 0;
+            r < BOARD_SIZE;
+            r++
+        ) {
+
+            const row = [];
+
+
+            for (
+                let c = 0;
+                c < BOARD_SIZE;
+                c++
+            ) {
+
+                row.push({
+
+                    mine: false,
+
+                    revealed: false,
+
+                    flag: false,
+
+                    adjacent: 0,
+
+                    hitMine: false,
+
+                    wrongFlag: false
+
+                });
+
+            }
+
+
+            newGrid.push(row);
+        }
+
+
+        return newGrid;
+    }
+
+
+    /* ================= MINE PLACEMENT ================= */
+
+    function placeMines(
+        excludeR,
+        excludeC
+    ) {
+
+        let placed = 0;
+
+        const excluded =
+            new Set();
+
+
+        /* 첫 클릭 주변 8칸 보호 */
+
+        for (
+            let dr = -1;
+            dr <= 1;
+            dr++
+        ) {
+
+            for (
+                let dc = -1;
+                dc <= 1;
+                dc++
+            ) {
+
+                const nr =
+                    excludeR + dr;
+
+                const nc =
+                    excludeC + dc;
+
+
+                if (
+
+                    nr >= 0 &&
+                    nr < BOARD_SIZE &&
+
+                    nc >= 0 &&
+                    nc < BOARD_SIZE
+
+                ) {
+
+                    excluded.add(
+                        nr + "," + nc
+                    );
+
+                }
+
+            }
+
+        }
+
+
+        while (
+            placed < MINE_COUNT
+        ) {
+
+            const r =
+                Math.floor(
+                    Math.random() *
+                    BOARD_SIZE
+                );
+
+            const c =
+                Math.floor(
+                    Math.random() *
+                    BOARD_SIZE
+                );
+
+
+            const key =
+                r + "," + c;
+
+
+            if (
+                excluded.has(key)
+            ) continue;
+
+
+            if (
+                grid[r][c].mine
+            ) continue;
+
+
+            grid[r][c].mine =
+                true;
+
+
+            placed++;
+        }
+
+
+        /* 주변 숫자 계산 */
+
+        for (
+            let r = 0;
+            r < BOARD_SIZE;
+            r++
+        ) {
+
+            for (
+                let c = 0;
+                c < BOARD_SIZE;
+                c++
+            ) {
+
+                if (
+                    grid[r][c].mine
+                ) continue;
+
+
+                grid[r][c].adjacent =
+                    countAdjacentMines(
+                        r,
+                        c
+                    );
+
+            }
+
+        }
+
+    }
+
+
+    function countAdjacentMines(
+        r,
+        c
+    ) {
+
+        let count = 0;
+
+
+        for (
+            let dr = -1;
+            dr <= 1;
+            dr++
+        ) {
+
+            for (
+                let dc = -1;
+                dc <= 1;
+                dc++
+            ) {
+
+                if (
+                    dr === 0 &&
+                    dc === 0
+                ) continue;
+
+
+                const nr =
+                    r + dr;
+
+                const nc =
+                    c + dc;
+
+
+                if (
+
+                    nr >= 0 &&
+                    nr < BOARD_SIZE &&
+
+                    nc >= 0 &&
+                    nc < BOARD_SIZE
+
+                ) {
+
+                    if (
+                        grid[nr][nc].mine
+                    ) {
+
+                        count++;
+
+                    }
+
+                }
+
+            }
+
+        }
+
+
+        return count;
+    }
+
+
+    /* ================= BOARD BUILD ================= */
+
+    function buildBoardDOM() {
+
+        boardEl.innerHTML =
+            "";
+
+
+        cellElems = [];
+
+
+        const cellSize =
+            BOARD_SIZE === 9
+                ? 32
+                : 26;
+
+
+        boardEl.style.gridTemplateColumns =
+            `repeat(${BOARD_SIZE}, ${cellSize}px)`;
+
+
+        boardEl.style.gridTemplateRows =
+            `repeat(${BOARD_SIZE}, ${cellSize}px)`;
+
+
+        for (
+            let r = 0;
+            r < BOARD_SIZE;
+            r++
+        ) {
+
+            const rowElems = [];
+
+
+            for (
+                let c = 0;
+                c < BOARD_SIZE;
+                c++
+            ) {
+
+                const cellDiv =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                cellDiv.className =
+                    "cell";
+
+
+                cellDiv.dataset.r =
+                    r;
+
+                cellDiv.dataset.c =
+                    c;
+
+
+                cellDiv.style.width =
+                    cellSize + "px";
+
+                cellDiv.style.height =
+                    cellSize + "px";
+
+
+                cellDiv.style.fontSize =
+                    BOARD_SIZE === 9
+                        ? "15px"
+                        : "13px";
+
+
+                if (
+                    IS_TOUCH_DEVICE
+                ) {
+
+                    cellDiv.addEventListener(
+
+                        "touchend",
+
+                        onCellTouchEnd,
+
+                        {
+                            passive: false
+                        }
+
+                    );
+
+
+                    cellDiv.addEventListener(
+
+                        "contextmenu",
+
+                        e => e.preventDefault()
+
+                    );
+
+                } else {
+
+                    cellDiv.addEventListener(
+
+                        "click",
+
+                        onCellClick
+
+                    );
+
+
+                    cellDiv.addEventListener(
+
+                        "contextmenu",
+
+                        onCellContextMenu
+
+                    );
+
+                }
+
+
+                boardEl.appendChild(
+                    cellDiv
+                );
+
+
+                rowElems.push(
+                    cellDiv
+                );
+
+            }
+
+
+            cellElems.push(
+                rowElems
+            );
+
+        }
+
+    }
+
+
+    /* ================= DESKTOP ================= */
+
+    function onCellClick(e) {
+
+        if (!gameActive) return;
+
+
+        const r =
+            Number(
+                e.currentTarget.dataset.r
+            );
+
+        const c =
+            Number(
+                e.currentTarget.dataset.c
+            );
+
+
+        openCellAction(r, c);
+    }
+
+
+    function onCellContextMenu(e) {
+
+        e.preventDefault();
+
+
+        if (!gameActive) return;
+
+
+        const r =
+            Number(
+                e.currentTarget.dataset.r
+            );
+
+        const c =
+            Number(
+                e.currentTarget.dataset.c
+            );
+
+
+        toggleFlagAction(r, c);
+    }
+
+
+    /* ================= MOBILE ================= */
+
+    function onCellTouchEnd(e) {
+
+        e.preventDefault();
+
+
+        if (!gameActive) return;
+
+
+        const el =
+            e.currentTarget;
+
+
+        const r =
+            Number(
+                el.dataset.r
+            );
+
+        const c =
+            Number(
+                el.dataset.c
+            );
+
+
+        const key =
+            r + "," + c;
+
+
+        const now =
+            Date.now();
+
+
+        const previous =
+            lastTapTimes[key] ||
+            0;
+
+
+        /* 더블 터치 */
+
+        if (
+            now - previous <
+            DOUBLE_TAP_DELAY
+        ) {
+
+            if (
+                pendingTimers[key]
+            ) {
+
+                clearTimeout(
+                    pendingTimers[key]
+                );
+
+                delete pendingTimers[key];
+
+            }
+
+
+            delete lastTapTimes[key];
+
+
+            toggleFlagAction(r, c);
+
+
+            return;
+        }
+
+
+        /* 싱글 터치 대기 */
+
+        lastTapTimes[key] =
+            now;
+
+
+        pendingTimers[key] =
+            setTimeout(() => {
+
+                delete pendingTimers[key];
+
+                delete lastTapTimes[key];
+
+
+                openCellAction(r, c);
+
+            }, DOUBLE_TAP_DELAY);
+
+    }
+
+
+    /* ================= OPEN CELL ================= */
+
+    function openCellAction(
+        r,
+        c
+    ) {
+
+        if (!gameActive) return;
+
+
+        const cell =
+            grid[r][c];
+
+
+        if (
+            cell.revealed ||
+            cell.flag
+        ) return;
+
+
+        /* 첫 클릭 */
+
+        if (
+            !firstClickDone
+        ) {
+
+            placeMines(r, c);
+
+            firstClickDone =
+                true;
+
+        }
+
+
+        /* 지뢰 클릭 */
+
+        if (
+            cell.mine
+        ) {
+
+            triggerGameOver(
+                r,
+                c
+            );
+
+            return;
+        }
+
+
+        openCellRecursive(
+            r,
+            c
+        );
+
+
+        updateBoardDisplay();
+
+
+        /* 안전한 칸 전부 열면 승리 */
+
+        if (
+            openedSafeCount >=
+            SAFE_CELLS
+        ) {
+
+            endGame(true);
+
+        }
+
+    }
+
+
+    /* ================= FLAG ================= */
+
+    function toggleFlagAction(
+        r,
+        c
+    ) {
+
+        if (!gameActive) return;
+
+        const cell =
+            grid[r][c];
+
+        if (
+            cell.revealed
+        ) return;
+
+        const currentFlagCount =
+            countFlags();
+
+        /* 깃발 제거 */
+        if (
+            cell.flag
+        ) {
+
+            cell.flag =
+                false;
+
+        }
+
+        /* 깃발 추가 */
+        else {
+
+            if (
+                currentFlagCount >=
+                MINE_COUNT
+            ) {
+
+                return;
+
+            }
+
+            cell.flag =
+                true;
+
+        }
+
+        updateBoardDisplay();
+
+        updateMineCounter();
+
+        /* 모든 실제 지뢰 위치에 정확히 깃발을 꽂았을 때만 CLEAR */
+        if (
+            areAllMinesCorrectlyFlagged()
+        ) {
+
+            endGame(true);
+
+        }
+
+    }
+
+
+    function areAllMinesCorrectlyFlagged() {
+
+        let correctFlagCount =
+            0;
+
+        for (
+            let r = 0;
+            r < BOARD_SIZE;
+            r++
+        ) {
+
+            for (
+                let c = 0;
+                c < BOARD_SIZE;
+                c++
+            ) {
+
+                const cell =
+                    grid[r][c];
+
+                /* 안전한 칸에 깃발이 하나라도 있으면 실패 */
+                if (
+                    cell.flag &&
+                    !cell.mine
+                ) {
+
+                    return false;
+
+                }
+
+                /* 실제 지뢰 위치에 깃발이 꽂힌 경우 */
+                if (
+                    cell.mine &&
+                    cell.flag
+                ) {
+
+                    correctFlagCount++;
+
+                }
+
+            }
+
+        }
+
+        return (
+            correctFlagCount ===
+            MINE_COUNT
+        );
+
+    }
+
+
+    function countFlags() {
+
+        let count = 0;
+
+
+        for (
+            let r = 0;
+            r < BOARD_SIZE;
+            r++
+        ) {
+
+            for (
+                let c = 0;
+                c < BOARD_SIZE;
+                c++
+            ) {
+
+                if (
+                    grid[r][c].flag
+                ) {
+
+                    count++;
+
+                }
+
+            }
+
+        }
+
+
+        return count;
+    }
+
+
+    /* ================= RECURSIVE OPEN ================= */
+
+    function openCellRecursive(
+        startR,
+        startC
+    ) {
+
+        const stack = [
+            [startR, startC]
+        ];
+
+
+        while (
+            stack.length > 0
+        ) {
+
+            const current =
+                stack.pop();
+
+
+            const r =
+                current[0];
+
+            const c =
+                current[1];
+
+
+            const cell =
+                grid[r][c];
+
+
+            if (
+
+                cell.revealed ||
+
+                cell.flag ||
+
+                cell.mine
+
+            ) {
+
+                continue;
+
+            }
+
+
+            cell.revealed =
+                true;
+
+
+            openedSafeCount++;
+
+
+            if (
+                cell.adjacent === 0
+            ) {
+
+                for (
+                    let dr = -1;
+                    dr <= 1;
+                    dr++
+                ) {
+
+                    for (
+                        let dc = -1;
+                        dc <= 1;
+                        dc++
+                    ) {
+
+                        if (
+
+                            dr === 0 &&
+
+                            dc === 0
+
+                        ) continue;
+
+
+                        const nr =
+                            r + dr;
+
+                        const nc =
+                            c + dc;
+
+
+                        if (
+
+                            nr >= 0 &&
+
+                            nr < BOARD_SIZE &&
+
+                            nc >= 0 &&
+
+                            nc < BOARD_SIZE
+
+                        ) {
+
+                            const neighbor =
+                                grid[nr][nc];
+
+
+                            if (
+
+                                !neighbor.revealed &&
+
+                                !neighbor.flag &&
+
+                                !neighbor.mine
+
+                            ) {
+
+                                stack.push(
+                                    [nr, nc]
+                                );
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+    /* ================= GAME OVER ================= */
+
+    function triggerGameOver(
+        hitR,
+        hitC
+    ) {
+
+        if (
+            gameOverProcessing
+        ) return;
+
+
+        gameOverProcessing =
+            true;
+
+
+        /* 즉시 모든 입력 차단 */
+
+        gameActive =
+            false;
+
+
+        /* 클릭한 지뢰 표시 */
+
+        grid[hitR][hitC].hitMine =
+            true;
+
+
+        /* 모든 지뢰 공개 */
+
+        for (
+            let r = 0;
+            r < BOARD_SIZE;
+            r++
+        ) {
+
+            for (
+                let c = 0;
+                c < BOARD_SIZE;
+                c++
+            ) {
+
+                const cell =
+                    grid[r][c];
+
+
+                if (
+                    cell.mine
+                ) {
+
+                    cell.revealed =
+                        true;
+
+                }
+
+
+                /* 잘못된 깃발 */
+
+                if (
+
+                    cell.flag &&
+
+                    !cell.mine
+
+                ) {
+
+                    cell.wrongFlag =
+                        true;
+
+                }
+
+            }
+
+        }
+
+
+        /* 지뢰 전부 보이게 업데이트 */
+
+        updateBoardDisplay();
+
+
+        /* 게임오버 얼굴 */
+
+        smileyBtn.textContent =
+            "😵";
+
+
+        /* 5초 후 결과창 */
+
+        setTimeout(() => {
+
+            showGameOverResult();
+
+        }, GAME_OVER_DELAY);
+
+    }
+
+
+    /* ================= DISPLAY ================= */
+
+    function updateBoardDisplay() {
+
+        for (
+            let r = 0;
+            r < BOARD_SIZE;
+            r++
+        ) {
+
+            for (
+                let c = 0;
+                c < BOARD_SIZE;
+                c++
+            ) {
+
+                const cell =
+                    grid[r][c];
+
+                const el =
+                    cellElems[r][c];
+
+
+                el.className =
+                    "cell";
+
+
+                /* 잘못된 깃발 */
+
+                if (
+                    cell.wrongFlag
+                ) {
+
+                    el.textContent =
+                        "✖";
+
+
+                    el.classList.add(
+                        "wrong-flag"
+                    );
+
+
+                    continue;
+                }
+
+
+                /* 공개된 칸 */
+
+                if (
+                    cell.revealed
+                ) {
+
+                    el.classList.add(
+                        "open"
+                    );
+
+
+                    /* 지뢰 */
+
+                    if (
+                        cell.mine
+                    ) {
+
+                        el.textContent =
+                            "💣";
+
+
+                        if (
+                            cell.hitMine
+                        ) {
+
+                            el.classList.add(
+                                "mine-hit"
+                            );
+
+                        }
+
+                    }
+
+
+                    /* 숫자 */
+
+                    else if (
+                        cell.adjacent > 0
+                    ) {
+
+                        el.textContent =
+                            cell.adjacent;
+
+
+                        el.classList.add(
+                            "n" +
+                            cell.adjacent
+                        );
+
+                    }
+
+
+                    /* 빈칸 */
+
+                    else {
+
+                        el.textContent =
+                            "";
+
+                    }
+
+                }
+
+
+                /* 닫힌 칸 */
+
+                else {
+
+                    if (
+                        cell.flag
+                    ) {
+
+                        el.textContent =
+                            "🚩";
+
+                    }
+
+                    else {
+
+                        el.textContent =
+                            "";
+
+                    }
+
+                }
+
+            }
+
+        }
+
+
+        updateScoreCounter();
+    }
+
+
+    /* ================= COUNTERS ================= */
+
+    function updateMineCounter() {
+
+        const flagCount =
+            countFlags();
+
+
+        const remaining =
+            MINE_COUNT -
+            flagCount;
+
+
+        mineCounterEl.textContent =
+            String(
+                Math.max(
+                    0,
+                    remaining
+                )
+            ).padStart(3, "0");
+    }
+
+
+    function updateScoreCounter() {
+
+        scoreCounterEl.textContent =
+            String(
+                openedSafeCount
+            ).padStart(3, "0");
+    }
+
+
+    /* ================= SCORE ================= */
+
+    function calculateScore() {
+
+        return openedSafeCount;
+    }
+
+
+    /* ================= END GAME ================= */
+
+    function endGame(won) {
+
+        gameActive =
+            false;
+
+
+        if (
+            won
+        ) {
+
+            smileyBtn.textContent =
+                "😎";
+
+
+            resultTitle.textContent =
+                "CLEAR!";
+
+
+            resultTitle.className =
+                "win";
+
+
+            resultSubtitle.textContent =
+                "모든 안전한 칸을 열었습니다!";
+
+
+            resScore.textContent =
+                String(
+                    calculateScore()
+                ).padStart(3, "0");
+
+
+            resultModalOverlay
+                .classList
+                .add("active");
+
+        }
+
+    }
+
+
+    function showGameOverResult() {
+
+        resultTitle.textContent =
+            "GAME OVER";
+
+
+        resultTitle.className =
+            "lose";
+
+
+        resultSubtitle.textContent =
+            "지뢰를 밟았습니다.";
+
+
+        resScore.textContent =
+            String(
+                calculateScore()
+            ).padStart(3, "0");
+
+
+        resultModalOverlay
+            .classList
+            .add("active");
+
+    }
+
+
+    /* ================= START ================= */
+
+    function startNewGame() {
+
+        /* 기존 터치 타이머 제거 */
+
+        Object.keys(
+            pendingTimers
+        ).forEach(key => {
+
+            clearTimeout(
+                pendingTimers[key]
+            );
+
+        });
+
+
+        pendingTimers =
+            {};
+
+        lastTapTimes =
+            {};
+
+
+        grid =
+            createEmptyGrid();
+
+
+        TOTAL_CELLS =
+            BOARD_SIZE *
+            BOARD_SIZE;
+
+
+        SAFE_CELLS =
+            TOTAL_CELLS -
+            MINE_COUNT;
+
+
+        firstClickDone =
+            false;
+
+
+        gameActive =
+            true;
+
+
+        gameOverProcessing =
+            false;
+
+
+        openedSafeCount =
+            0;
+
+
+        mineCounterEl.textContent =
+            String(
+                MINE_COUNT
+            ).padStart(3, "0");
+
+
+        scoreCounterEl.textContent =
+            "000";
+
+
+        smileyBtn.textContent =
+            "🙂";
+
+
+        resultModalOverlay
+            .classList
+            .remove("active");
+
+
+        buildBoardDOM();
+
+        updateBoardDisplay();
+
+
+        showScreen("game");
+
+    }
+
+
+    /* ================= DIFFICULTY ================= */
+
+    difficultyButtons.forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    difficultyButtons
+                        .forEach(btn => {
+
+                            btn.classList.remove(
+                                "selected"
+                            );
+
+                        });
+
+
+                    button.classList.add(
+                        "selected"
+                    );
+
+
+                    BOARD_SIZE =
+                        Number(
+                            button.dataset.size
+                        );
+
+
+                    MINE_COUNT =
+                        Number(
+                            button.dataset.mines
+                        );
+
+                }
+            );
+
+        }
+    );
+
+
+    /* ================= EVENTS ================= */
+
+    startBtn.addEventListener(
+        "click",
+        startNewGame
+    );
+
+
+    smileyBtn.addEventListener(
+        "click",
+        () => {
+
+            if (
+                gameOverProcessing
+            ) return;
+
+
+            startNewGame();
+
+        }
+    );
+
+
+    retryBtn.addEventListener(
+        "click",
+        startNewGame
+    );
+
+
+    homeBtn.addEventListener(
+        "click",
+        () => {
+
+            gameActive =
+                false;
+
+
+            gameOverProcessing =
+                false;
+
+
+            resultModalOverlay
+                .classList
+                .remove("active");
+
+
+            showScreen(
+                "guide"
+            );
+
+        }
+    );
+
+
+    /* ================= INIT ================= */
+
+    showScreen(
+        "guide"
+    );
+
+})();
+</script>
+
+</body>
+</html>
