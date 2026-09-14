@@ -191,6 +191,22 @@ body {
     display: flex;
     justify-content: center;
     gap: 10px;
+    flex-wrap: wrap;
+}
+
+.nickname-select {
+    margin-top: 18px;
+}
+
+.nickname-input {
+    width: 100%;
+    max-width: 260px;
+    padding: 8px 10px;
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    text-align: center;
+    border: none;
+    outline: none;
 }
 
 .diff-btn {
@@ -529,6 +545,24 @@ body {
             </div>
 
 
+            <div class="nickname-select">
+
+                <div class="difficulty-title">
+                    트위터 아이디를 입력하세요
+                </div>
+
+
+                <input
+                    type="text"
+                    id="nickname-input"
+                    class="nickname-input panel-in"
+                    placeholder="@ 트위터 아이디"
+                    maxlength="16"
+                    autocomplete="off">
+
+            </div>
+
+
             <div class="difficulty-select">
 
                 <div class="difficulty-title">
@@ -556,6 +590,17 @@ body {
 
                         HARD<br>
                         12 × 12
+
+                    </button>
+
+
+                    <button
+                        class="win-btn diff-btn"
+                        data-size="24"
+                        data-mines="130">
+
+                        EXTREME<br>
+                        24 × 24
 
                     </button>
 
@@ -660,6 +705,21 @@ body {
                     <div id="result-title"></div>
 
                     <div id="result-subtitle"></div>
+
+
+                    <div
+                        class="result-row panel-in">
+
+                        <span class="rlabel">
+                            PLAYER
+                        </span>
+
+                        <span
+                            class="rvalue"
+                            id="res-player">
+                        </span>
+
+                    </div>
 
 
                     <div
@@ -775,6 +835,8 @@ body {
 
     let cellElems = [];
 
+    let playerNickname = "";
+
 
     let lastTapTimes = {};
 
@@ -797,6 +859,9 @@ body {
 
     const startBtn =
         document.getElementById("start-btn");
+
+    const nicknameInput =
+        document.getElementById("nickname-input");
 
     const mineCounterEl =
         document.getElementById("mine-counter");
@@ -828,6 +893,11 @@ body {
     const resScore =
         document.getElementById(
             "res-score"
+        );
+
+    const resPlayer =
+        document.getElementById(
+            "res-player"
         );
 
     const retryBtn =
@@ -1978,6 +2048,10 @@ body {
                 "모든 안전한 칸을 열었습니다!";
 
 
+            resPlayer.textContent =
+                playerNickname;
+
+
             resScore.textContent =
                 String(
                     calculateScore()
@@ -2005,6 +2079,10 @@ body {
 
         resultSubtitle.textContent =
             "지뢰를 밟았습니다.";
+
+
+        resPlayer.textContent =
+            playerNickname;
 
 
         resScore.textContent =
@@ -2145,11 +2223,155 @@ body {
     );
 
 
+    /* ================= TWITTER ID INPUT ================= */
+
+    const TWITTER_ID_MIN_LENGTH = 4;
+
+    const TWITTER_ID_MAX_LENGTH = 15;
+
+    const TWITTER_ID_PATTERN =
+        /^[A-Za-z0-9_]+$/;
+
+    const RESERVED_TWITTER_IDS =
+        ["twitter", "admin"];
+
+
+    nicknameInput.addEventListener(
+        "focus",
+        () => {
+
+            if (
+                nicknameInput.value === ""
+            ) {
+
+                nicknameInput.value =
+                    "@";
+
+            }
+
+        }
+    );
+
+
+    nicknameInput.addEventListener(
+        "input",
+        () => {
+
+            let raw =
+                nicknameInput.value;
+
+
+            /* '@' 문자는 사용자가 직접 입력할 수 없고 자동으로만 붙는다 */
+
+            raw =
+                raw.replace(/@/g, "");
+
+
+            /* 영문, 숫자, 밑줄(_)만 허용 */
+
+            raw =
+                raw.replace(
+                    /[^A-Za-z0-9_]/g,
+                    ""
+                );
+
+
+            /* 최대 15자 (@ 제외) */
+
+            raw =
+                raw.slice(
+                    0,
+                    TWITTER_ID_MAX_LENGTH
+                );
+
+
+            nicknameInput.value =
+                "@" + raw;
+
+        }
+    );
+
+
     /* ================= EVENTS ================= */
 
     startBtn.addEventListener(
         "click",
-        startNewGame
+        () => {
+
+            const enteredId =
+                nicknameInput.value
+                    .replace(/^@+/, "")
+                    .trim();
+
+
+            if (!enteredId) {
+
+                alert(
+                    "트위터 아이디를 입력해주세요."
+                );
+
+                nicknameInput.focus();
+
+                return;
+            }
+
+
+            if (
+                enteredId.length <
+                    TWITTER_ID_MIN_LENGTH ||
+                enteredId.length >
+                    TWITTER_ID_MAX_LENGTH
+            ) {
+
+                alert(
+                    "트위터 아이디는 4자 이상 15자 이하로 입력해주세요."
+                );
+
+                nicknameInput.focus();
+
+                return;
+            }
+
+
+            if (
+                !TWITTER_ID_PATTERN.test(
+                    enteredId
+                )
+            ) {
+
+                alert(
+                    "트위터 아이디는 영문, 숫자, 밑줄(_)만 사용할 수 있습니다."
+                );
+
+                nicknameInput.focus();
+
+                return;
+            }
+
+
+            if (
+                RESERVED_TWITTER_IDS.includes(
+                    enteredId.toLowerCase()
+                )
+            ) {
+
+                alert(
+                    "사용할 수 없는 트위터 아이디입니다."
+                );
+
+                nicknameInput.focus();
+
+                return;
+            }
+
+
+            playerNickname =
+                "@" + enteredId;
+
+
+            startNewGame();
+
+        }
     );
 
 
