@@ -214,21 +214,6 @@ body {
     outline: none;
 }
 
-.nickname-select {
-    margin-top: 18px;
-}
-
-.nickname-input {
-    width: 100%;
-    max-width: 260px;
-    padding: 8px 10px;
-    font-family: "Courier New", monospace;
-    font-size: 13px;
-    text-align: center;
-    border: none;
-    outline: none;
-}
-
 .diff-btn {
     min-width: 105px;
     padding: 9px;
@@ -539,7 +524,7 @@ body {
 
             <h1>민재의 지뢰찾기</h1>
 
-            <h2>주한이 형 몰래 지뢰찾기 도전!</h2>
+            <h2>변호사님 몰래 지뢰찾기 도전!</h2>
 
 
             <div class="guide-box panel-in">
@@ -551,14 +536,14 @@ body {
 
                 <div class="guide-item">
                     <b>칸 열기</b><br>
-                    원하는 칸을 한 번 터치(좌 클릭)하세요. 
+                    원하는 칸을 한 번 터치하세요.
                 </div>
 
 
                 <div class="guide-item">
                     <b>깃발 표시</b><br>
-                    지뢰가 의심되는 같은 칸을 두 번 터치(우 클릭)하면 깃발을 꽂을 수 있습니다.
-                    다시 두 번 터치(우 클릭)하면 깃발을 제거할 수 있습니다.
+                    지뢰가 의심되는 같은 칸을 두 번 터치하면 깃발을 꽂을 수 있습니다.
+                    다시 두 번 터치하면 깃발을 제거할 수 있습니다.
                 </div>
 
 
@@ -791,9 +776,7 @@ body {
                         id="result-note"
                         class="panel-in">
 
-                        게임 결과 화면을 캡처하여<br>
-                        지정된 게시글에<br>
-                        참여 인증을 완료해주세요.
+                        [차주한] 강민재, 딴짓하지 마.<br>
 
                     </div>
 
@@ -2230,6 +2213,27 @@ body {
             .remove("active");
 
 
+        /* EXTREME(24 × 24) 게임 화면에서만 창 크기 확대 - 홈 화면 크기에는 영향 없음 */
+
+        if (
+            BOARD_SIZE === 24
+        ) {
+
+            windowEl.classList.add(
+                "extreme-mode"
+            );
+
+        }
+
+        else {
+
+            windowEl.classList.remove(
+                "extreme-mode"
+            );
+
+        }
+
+
         buildBoardDOM();
 
         updateBoardDisplay();
@@ -2276,16 +2280,11 @@ body {
                         );
 
 
-                    /* EXTREME(24 × 24) 전용 UI 처리 */
+                    /* 홈 화면 크기는 고정 유지 - 안내 문구만 토글 (창 크기 확대는 게임 화면 진입 시에만 적용) */
 
                     if (
                         BOARD_SIZE === 24
                     ) {
-
-                        windowEl.classList.add(
-                            "extreme-mode"
-                        );
-
 
                         extremeMobileNotice.classList.add(
                             "active"
@@ -2294,11 +2293,6 @@ body {
                     }
 
                     else {
-
-                        windowEl.classList.remove(
-                            "extreme-mode"
-                        );
-
 
                         extremeMobileNotice.classList.remove(
                             "active"
@@ -2501,6 +2495,13 @@ body {
             resultModalOverlay
                 .classList
                 .remove("active");
+
+
+            /* 홈 화면으로 돌아가면 창 크기를 기존 크기로 복원 */
+
+            windowEl.classList.remove(
+                "extreme-mode"
+            );
 
 
             showScreen(
