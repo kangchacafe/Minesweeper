@@ -933,6 +933,11 @@ body {
             "res-player"
         );
 
+    const resultNote =
+        document.getElementById(
+            "result-note"
+        );
+
     const retryBtn =
         document.getElementById(
             "retry-btn"
@@ -2100,6 +2105,10 @@ body {
                 ).padStart(3, "0");
 
 
+            resultNote.innerHTML =
+                "[강민재] 성공이다!<br>";
+
+
             resultModalOverlay
                 .classList
                 .add("active");
@@ -2131,6 +2140,10 @@ body {
             String(
                 calculateScore()
             ).padStart(3, "0");
+
+
+        resultNote.innerHTML =
+            "[차주한] 강민재, 딴짓하지 마.<br>";
 
 
         resultModalOverlay
